@@ -15,9 +15,8 @@ import {
   TableCell,
   Table,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import { ArrowRight, PlusCircle } from "lucide-react";
-import React, { useState, useTransition } from "react";
+import React, { useEffect, useMemo, useState, useTransition } from "react";
 import Modal from "@/components/custom/generic/modal";
 import {
   Form,
@@ -25,12 +24,19 @@ import {
   FormField,
   FormItem,
   FormLabel,
+  FormMessage,
 } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
-import { type CategoryDTO } from "@/types";
+import { Category, type CategoryDTO } from "@/types";
 import { CategorySchema } from "@/validation-schema/category.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
+import { useMutation, useQuery } from "react-query";
+import { queryKeys } from "@/factory/querykeys.factory";
+import { createCategory, getAllCategories } from "./action";
+import { toast } from "react-toastify";
+import DataTable from "@/components/custom/generic/datatable";
+import { getCategoryTableColumns } from "./columns";
 
 function CategoryPage() {
   const [showModal, setShowModal] = useState<boolean>(false);
@@ -44,11 +50,50 @@ function CategoryPage() {
   });
   const toggleModal = () => setShowModal((prev) => !prev);
 
+  const { data, isFetching } = useQuery({
+    queryKey: queryKeys.fetchCategories.all,
+    queryFn: () => getAllCategories(),
+    initialData: [],
+    // staleTime: 60 * 10,
+  });
+
+  const createMutation = useMutation({
+    mutationFn: createCategory,
+    onSuccess: ({ message }) => {
+      toast(message, { type: "success" });
+      toggleModal();
+    },
+    onError: (error) => {
+      //TODO:show error later
+      console.log(error);
+      toast("An error occured while adding category", {
+        type: "error",
+      });
+    },
+  });
+
   const doSubmit = (formData: CategoryDTO) => {
-    startTransition(() => {
+    startTransition(async () => {
       console.log(formData);
+      await createMutation.mutateAsync(formData);
     });
   };
+
+  const onEdit = (value: Category) => {
+    toast("On Edit Button clicked for " + value.name);
+  };
+  const onDelete = (value: Category) => {
+    toast("On Delete Button clicked for " + value.name);
+  };
+
+  const columns = useMemo(
+    () => getCategoryTableColumns({ onEdit, onDelete }),
+    [],
+  );
+
+  useEffect(() => {
+    form.reset();
+  }, [showModal]);
 
   return (
     <div className="grid gap-4 md:gap-8 lg:grid-cols-2 xl:grid-cols-3">
@@ -70,55 +115,11 @@ function CategoryPage() {
           </Button>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Customer</TableHead>
-                <TableHead className="hidden xl:table-column">Type</TableHead>
-                <TableHead className="hidden xl:table-column">Status</TableHead>
-                <TableHead className="hidden xl:table-column">Date</TableHead>
-                <TableHead className="text-right">Amount</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              <TableRow>
-                <TableCell>
-                  <div className="font-medium">Liam Johnson</div>
-                  <div className="hidden text-sm text-muted-foreground md:inline">
-                    liam@example.com
-                  </div>
-                </TableCell>
-                <TableCell className="hidden xl:table-column">Sale</TableCell>
-                <TableCell className="hidden xl:table-column">
-                  <Badge className="text-xs" variant="outline">
-                    Approved
-                  </Badge>
-                </TableCell>
-                <TableCell className="hidden md:table-cell lg:hidden xl:table-column">
-                  2023-06-23
-                </TableCell>
-                <TableCell className="text-right">$250.00</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>
-                  <div className="font-medium">Olivia Smith</div>
-                  <div className="hidden text-sm text-muted-foreground md:inline">
-                    olivia@example.com
-                  </div>
-                </TableCell>
-                <TableCell className="hidden xl:table-column">Refund</TableCell>
-                <TableCell className="hidden xl:table-column">
-                  <Badge className="text-xs" variant="outline">
-                    Declined
-                  </Badge>
-                </TableCell>
-                <TableCell className="hidden md:table-cell lg:hidden xl:table-column">
-                  2023-06-24
-                </TableCell>
-                <TableCell className="text-right">$150.00</TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
+          <DataTable
+            isFetching={isFetching}
+            data={data ? data : []}
+            columns={columns}
+          />
         </CardContent>
       </Card>
 
@@ -137,6 +138,7 @@ function CategoryPage() {
                   <FormControl>
                     <Input {...field} placeholder="" className="h-9" />
                   </FormControl>
+                  <FormMessage />
                 </FormItem>
               )}
             />
