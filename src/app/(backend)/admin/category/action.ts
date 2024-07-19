@@ -1,9 +1,14 @@
 "use server";
 import { ValidationError } from "@/lib/validation-error";
-import { getAll, create } from "@/repositories/category.repository";
+import {
+  getAll,
+  create,
+  remove,
+  getSingleById,
+  update,
+} from "@/repositories/category.repository";
 import { type CategoryDTO, type Category } from "@/types";
 import { CategorySchema } from "@/validation-schema/category.schema";
-import { NextResponse } from "next/server";
 
 export const getAllCategories = async (): Promise<Category[]> => {
   return await getAll();
@@ -11,32 +16,33 @@ export const getAllCategories = async (): Promise<Category[]> => {
 };
 
 export const createCategory = async (values: CategoryDTO) => {
-  try {
-    const validatedData = CategorySchema.safeParse(values);
-    if (validatedData.error) {
-      throw new ValidationError(validatedData.error.message);
-    }
-    await create(validatedData.data);
-    return {
-      success: true,
-      message: "Category was created successfully",
-    };
-  } catch (error) {
-    console.log(error);
-    let message;
-    let statusCode = 400;
-    if (error instanceof ValidationError) {
-      message = error.message;
-    } else {
-      message =
-        "An error just occured please try again or contact administrator";
-      statusCode = 500;
-    }
-
-    return {
-      success: false,
-      message: message,
-      statusCode,
-    };
+  const validatedData = CategorySchema.safeParse(values);
+  if (validatedData.error) {
+    throw new ValidationError(validatedData.error.message);
   }
+  return await create(validatedData.data);
+};
+
+export const deleteCategory = async (category: Category) => {
+  const { id } = category;
+  return await remove(id);
+};
+
+export const updateCategory = async (
+  categoryId: string,
+  values: CategoryDTO,
+) => {
+  const validatedData = CategorySchema.safeParse(values);
+  if (validatedData.error) {
+    throw new ValidationError(validatedData.error.message);
+  }
+
+  //get category by id
+  const existingCategory = await getSingleById(categoryId);
+  //if category is not found throw error
+  if (!existingCategory) throw new Error("No category was found");
+
+  //update category
+  return await update(existingCategory.id, validatedData.data);
+  //show success message
 };

@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { type Category } from "@/types";
 import { Pencil1Icon, TrashIcon } from "@radix-ui/react-icons";
 import { type ColumnDef } from "@tanstack/react-table";
-import { LucideEdit2 } from "lucide-react";
 
 interface ColumnProps {
   onEdit?: (value: Category) => void;

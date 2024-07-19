@@ -27,13 +27,18 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
-import { Category, type CategoryDTO } from "@/types";
+import { type Category, type CategoryDTO } from "@/types";
 import { CategorySchema } from "@/validation-schema/category.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
-import { useMutation, useQuery } from "react-query";
+import { useMutation, useQuery, useQueryClient } from "react-query";
 import { queryKeys } from "@/factory/querykeys.factory";
-import { createCategory, getAllCategories } from "./action";
+import {
+  createCategory,
+  deleteCategory,
+  getAllCategories,
+  updateCategory,
+} from "./action";
 import { toast } from "react-toastify";
 import DataTable from "@/components/custom/generic/datatable";
 import { getCategoryTableColumns } from "./columns";
@@ -41,12 +46,15 @@ import { getCategoryTableColumns } from "./columns";
 function CategoryPage() {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [isPending, startTransition] = useTransition();
+  const queryClient = useQueryClient();
+  const [edit, setEdit] = useState<Category>({ id: "", name: "" });
 
   const form = useForm<CategoryDTO>({
     resolver: zodResolver(CategorySchema),
     defaultValues: {
-      name: "",
+      ...edit,
     },
+    values: { ...edit },
   });
   const toggleModal = () => setShowModal((prev) => !prev);
 
@@ -59,15 +67,28 @@ function CategoryPage() {
 
   const createMutation = useMutation({
     mutationFn: createCategory,
-    onSuccess: ({ message }) => {
-      toast(message, { type: "success" });
-      toggleModal();
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.fetchCategories.all,
+      });
     },
-    onError: (error) => {
-      //TODO:show error later
-      console.log(error);
-      toast("An error occured while adding category", {
-        type: "error",
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, values }: { id: string; values: CategoryDTO }) =>
+      updateCategory(id, values),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.fetchCategories.all,
+      });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteCategory,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.fetchCategories.all,
       });
     },
   });
@@ -75,15 +96,58 @@ function CategoryPage() {
   const doSubmit = (formData: CategoryDTO) => {
     startTransition(async () => {
       console.log(formData);
-      await createMutation.mutateAsync(formData);
+      await createMutation.mutateAsync(formData, {
+        onSuccess: async () => {
+          toast("Category was created successfully", { type: "success" });
+          toggleModal();
+        },
+        onError: () => {
+          toast("An error occured while adding category", {
+            type: "error",
+          });
+        },
+      });
     });
   };
 
-  const onEdit = (value: Category) => {
-    toast("On Edit Button clicked for " + value.name);
+  const doEdit = (formData: CategoryDTO) => {
+    updateMutation.mutate(
+      { id: edit.id, values: formData },
+      {
+        onSuccess: async () => {
+          toast("Category was updated successfully", { type: "success" });
+          toggleModal();
+        },
+        onError: (error) => {
+          console.log(error);
+          toast("An error occured category was not updated", {
+            type: "error",
+          });
+        },
+      },
+    );
   };
+
+  const onEdit = (value: Category) => {
+    // const record = data?.find((search) => search.id == value.id);
+    setEdit((prev) => ({
+      ...prev,
+      ...value,
+    }));
+    toggleModal();
+  };
+
   const onDelete = (value: Category) => {
-    toast("On Delete Button clicked for " + value.name);
+    deleteMutation.mutate(value, {
+      onSuccess: async () => {
+        toast("Category was deleted successfully", { type: "success" });
+      },
+      onError: () => {
+        toast("An error occured category was not deleted", {
+          type: "error",
+        });
+      },
+    });
   };
 
   const columns = useMemo(
@@ -93,6 +157,9 @@ function CategoryPage() {
 
   useEffect(() => {
     form.reset();
+    if (showModal == false) {
+      setEdit({ id: "", name: "" });
+    }
   }, [showModal]);
 
   return (
@@ -103,10 +170,8 @@ function CategoryPage() {
       >
         <CardHeader className="flex flex-row items-center">
           <div className="grid gap-2">
-            <CardTitle>Transactions</CardTitle>
-            <CardDescription>
-              Recent transactions from your store.
-            </CardDescription>
+            <CardTitle>Category</CardTitle>
+            <CardDescription>List of added project categories</CardDescription>
           </div>
           <Button size="sm" className="ml-auto gap-1" onClick={toggleModal}>
             <PlusCircle className="h-4 w-4" />
@@ -127,7 +192,9 @@ function CategoryPage() {
         <Form {...form}>
           <form
             className="grid w-full items-start gap-6 pt-0"
-            onSubmit={form.handleSubmit(doSubmit)}
+            onSubmit={
+              edit.id ? form.handleSubmit(doEdit) : form.handleSubmit(doSubmit)
+            }
           >
             <FormField
               control={form.control}
@@ -148,7 +215,7 @@ function CategoryPage() {
               isLoading={isPending}
               loadingText="Creating Category"
             >
-              Create Category
+              {edit.id?.length > 0 ? "Edit Category" : "Create Category"}
             </Button>
           </form>
         </Form>
