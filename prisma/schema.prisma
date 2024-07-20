@@ -30,6 +30,7 @@ model Project {
     title       String
     categoryId  String
     category    Category? @relation(fields: [categoryId], references: [id])
+    // images      ProjectImages[]
     summary     String?
     description String?
     createdAt   DateTime  @default(now())
@@ -37,3 +38,9 @@ model Project {
 
     @@index([title])
 }
+
+// model ProjectImages {
+//     id        String  @id @default(cuid())
+//     projectId String
+//     project   Project @relation(fields: [projectId], references: [id])
+// }
