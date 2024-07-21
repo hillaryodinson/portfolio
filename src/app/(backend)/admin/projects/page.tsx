@@ -34,7 +34,7 @@ function ProjectPage() {
         <CardHeader className="flex flex-row items-center justify-between">
           <div className="grid gap-2">
             <CardTitle>Projects</CardTitle>
-            <CardDescription>List of added project categories</CardDescription>
+            <CardDescription>List of added projects</CardDescription>
           </div>
           <Link
             href="/admin/projects/create"
