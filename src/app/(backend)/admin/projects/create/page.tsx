@@ -31,6 +31,7 @@ import { Button } from "@/components/ui/button";
 import { createProject } from "../action";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import Tiptap from "@/components/custom/generic/editor";
 
 function CreateProjectPage() {
   const [isLoading, startTransition] = useTransition();
@@ -41,7 +42,7 @@ function CreateProjectPage() {
     resolver: zodResolver(ProjectSchema),
     defaultValues: {
       title: "",
-      description: "",
+      description: "Hello Africa",
       summary: "",
       categoryId: "",
     },
@@ -160,12 +161,13 @@ function CreateProjectPage() {
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <Textarea
+                      {/* <Textarea
                         {...field}
                         name="description"
                         disabled={isLoading}
                         placeholder="Project Description"
-                      />
+                      /> */}
+                      <Tiptap value={field.value} onChange={field.onChange} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
