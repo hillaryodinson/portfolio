@@ -16,36 +16,39 @@ const Tiptap = ({
   value: string | undefined;
   onChange: (value: string) => void;
 }) => {
-  const editor = useEditor({
-    extensions: [
-      StarterKit.configure({
-        heading: {
-          levels: [1, 2],
+  const editor = useEditor(
+    {
+      extensions: [
+        StarterKit.configure({
+          heading: {
+            levels: [1, 2],
+          },
+        }),
+        Underline,
+        FontSize,
+        TextStyle,
+        TextAlign.configure({
+          types: ["heading", "paragraph"],
+        }),
+      ],
+      content: value,
+      editorProps: {
+        attributes: {
+          class:
+            "prose max-w-none [&_ol]:list-decimal [&_ul]:list-disc min-h-[200px] w-full rounded-bl-md placeholder:text-muted-foreground rounded-br-md border border-input bg-background px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50 focus-visble:outline-none",
         },
-      }),
-      Underline,
-      FontSize,
-      TextStyle,
-      TextAlign.configure({
-        types: ["heading", "paragraph"],
-      }),
-    ],
-    content: value,
-    editorProps: {
-      attributes: {
-        class:
-          "prose max-w-none [&_ol]:list-decimal [&_ul]:list-disc min-h-[200px] w-full rounded-bl-md placeholder:text-muted-foreground rounded-br-md border border-input bg-background px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50 focus-visble:outline-none",
+      },
+
+      onUpdate({ editor }) {
+        onChange(editor?.getHTML());
+      },
+      onSelectionUpdate({ editor }) {
+        // The selection has changed.
+        console.table(editor.getAttributes("textStyles"));
       },
     },
-
-    onUpdate({ editor }) {
-      onChange(editor?.getHTML());
-    },
-    onSelectionUpdate({ editor }) {
-      // The selection has changed.
-      console.table(editor.getAttributes("textStyles"));
-    },
-  });
+    [value],
+  );
 
   if (editor == null) {
     return null;

@@ -121,7 +121,7 @@ function EditorToolbar({ editor }: { editor: Editor }) {
           onChange={(val) => setFontSize(val)}
           value={editor.getAttributes("fontSize").fontSize}
         />
-        {/* Center Align */}
+        {/* Left Align */}
         <button
           onClick={(e) => {
             if (editor.isActive({ textAlign: "left" })) {
