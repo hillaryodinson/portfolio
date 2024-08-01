@@ -13,7 +13,7 @@ const Tiptap = ({
   value,
   onChange,
 }: {
-  value: string;
+  value: string | undefined;
   onChange: (value: string) => void;
 }) => {
   const editor = useEditor({

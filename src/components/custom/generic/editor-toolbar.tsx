@@ -121,9 +121,10 @@ function EditorToolbar({ editor }: { editor: Editor }) {
           onChange={(val) => setFontSize(val)}
           value={editor.getAttributes("fontSize").fontSize}
         />
+        {/* Center Align */}
         <button
           onClick={(e) => {
-            if (editor.isActive({ textAlign: "center" })) {
+            if (editor.isActive({ textAlign: "left" })) {
               execCmd(e).unsetTextAlign().run();
             } else {
               execCmd(e).setTextAlign("left").run();
@@ -137,6 +138,8 @@ function EditorToolbar({ editor }: { editor: Editor }) {
         >
           <AlignLeft className="h-4 w-4" />
         </button>
+
+        {/* Center Justified */}
         <button
           onClick={(e) => {
             if (editor.isActive({ textAlign: "center" })) {
@@ -153,6 +156,8 @@ function EditorToolbar({ editor }: { editor: Editor }) {
         >
           <AlignCenter className="h-4 w-4" />
         </button>
+
+        {/* Right Justified */}
         <button
           onClick={(e) => {
             if (editor.isActive({ textAlign: "right" })) {
@@ -169,6 +174,8 @@ function EditorToolbar({ editor }: { editor: Editor }) {
         >
           <AlignRight className="h-4 w-4" />
         </button>
+
+        {/* Align Justified */}
         <button
           onClick={(e) => {
             if (editor.isActive({ textAlign: "justify" })) {
@@ -199,11 +206,9 @@ const HeadingControl = ({
 }) => {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger>
-        <button className="flex items-center justify-between gap-1">
-          <Heading className="h-4 w-4" />
-          <ChevronDown className="h-4 w-4" />
-        </button>
+      <DropdownMenuTrigger className="flex items-center justify-between gap-1">
+        <Heading className="h-4 w-4" />
+        <ChevronDown className="h-4 w-4" />
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-[100px]">
         <DropdownMenuLabel>Headings</DropdownMenuLabel>
