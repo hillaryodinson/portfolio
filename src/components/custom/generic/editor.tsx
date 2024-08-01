@@ -9,6 +9,9 @@ import Underline from "@tiptap/extension-underline";
 import TextStyle from "@tiptap/extension-text-style";
 import FontSize from "tiptap-extension-font-size";
 import TextAlign from "@tiptap/extension-text-align";
+import BulletList from "@tiptap/extension-bullet-list";
+import OrderedList from "@tiptap/extension-ordered-list";
+import ListItem from "@tiptap/extension-list-item";
 
 const Tiptap = ({
   value,
@@ -30,6 +33,9 @@ const Tiptap = ({
       TextAlign.configure({
         types: ["heading", "paragraph"],
       }),
+      BulletList,
+      OrderedList,
+      ListItem,
     ],
     content: value,
     editorProps: {

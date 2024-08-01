@@ -14,6 +14,8 @@ import {
   Heading2,
   Heading3,
   Italic,
+  List,
+  ListOrdered,
   Redo,
   Type,
   Underline,
@@ -121,6 +123,7 @@ function EditorToolbar({ editor }: { editor: Editor }) {
           onChange={(val) => setFontSize(val)}
           value={editor.getAttributes("fontSize").fontSize}
         />
+        <Separator orientation="vertical" className="mx-1 bg-slate-300" />
         {/* Left Align */}
         <button
           onClick={(e) => {
@@ -191,6 +194,29 @@ function EditorToolbar({ editor }: { editor: Editor }) {
           })}
         >
           <AlignJustify className="h-4 w-4" />
+        </button>
+        <Separator orientation="vertical" className="mx-1 bg-slate-300" />
+        <button
+          onClick={(e) => {
+            execCmd(e).toggleBulletList().run();
+          }}
+          className={cn("px-1 py-1", {
+            "rounded-sm bg-muted text-muted-foreground":
+              editor.isActive("bulletList"),
+          })}
+        >
+          <List className="h-4 w-4" />
+        </button>
+        <button
+          onClick={(e) => {
+            execCmd(e).toggleOrderedList().run();
+          }}
+          className={cn("px-1 py-1", {
+            "rounded-sm bg-muted text-muted-foreground":
+              editor.isActive("orderedList"),
+          })}
+        >
+          <ListOrdered className="h-4 w-4" />
         </button>
       </div>
     </div>
