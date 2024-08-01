@@ -9,15 +9,21 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { PlusCircle, ArrowRight } from "lucide-react";
-import React, { useMemo } from "react";
-import { useQuery } from "react-query";
+import React, { useMemo, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "react-query";
 import { queryKeys } from "@/factory/querykeys.factory";
-import { getAllProjects } from "./action";
+import { deleteProject, getAllProjects } from "./action";
 import { getProjectTableColumns } from "./columns";
 import Link from "next/link";
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
+import { type Project } from "@/types";
+import { useConfirm } from "@/components/custom/generic/alert-dialog";
 
 function ProjectPage() {
-  const columns = useMemo(() => getProjectTableColumns({}), []);
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  const confirm = useConfirm();
 
   const { data, isFetching } = useQuery({
     initialData: [],
@@ -25,6 +31,55 @@ function ProjectPage() {
     queryFn: () => getAllProjects(),
   });
 
+  const deleteMutation = useMutation({
+    mutationFn: deleteProject,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.fetchProjects.all,
+      });
+    },
+  });
+
+  const onEdit = (project: Project) => {
+    router.push(`/admin/projects/${project.id}/edit`);
+  };
+
+  const onDelete = async (project: Project) => {
+    const consentReceived = await confirm({
+      title: "Are you sure?",
+      body: "You are about to delete this project " + project.title,
+      actionButton: "Delete",
+    });
+
+    if (consentReceived) {
+      deleteMutation.mutate(project.id, {
+        onSuccess: () => {
+          toast("Project was deleted successfully", {
+            type: "success",
+          });
+        },
+        onError: () => {
+          toast("Project was not deleted", {
+            type: "error",
+          });
+        },
+      });
+    }
+  };
+
+  // const doDelete = (id) => {
+  //   return toast(
+  //     "Are you sure you want to delete this item " + project.title + "?",
+  //     {
+  //       draggable: true,
+  //     },
+  //   );
+  // };
+
+  const columns = useMemo(
+    () => getProjectTableColumns({ onEdit, onDelete }),
+    [],
+  );
   return (
     <div className="grid gap-4 md:gap-8 lg:grid-cols-2 xl:grid-cols-3">
       <Card

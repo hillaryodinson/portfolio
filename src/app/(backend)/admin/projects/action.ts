@@ -5,6 +5,7 @@ import {
   create,
   getAll,
   getSingleById,
+  remove,
   update,
 } from "@/repositories/project.repository";
 import { type ProjectDTO } from "@/types";
@@ -41,4 +42,17 @@ export const updateProject = async (projectId: string, values: ProjectDTO) => {
   }
 
   return await update(project.id, validated.data);
+};
+
+export const fetchProject = async (projectId: string) => {
+  const project = await getSingleById(projectId);
+  if (!project) {
+    throw new ValidationError("Project was not found");
+  }
+
+  return project;
+};
+
+export const deleteProject = async (projectId: string) => {
+  return await remove(projectId);
 };

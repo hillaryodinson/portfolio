@@ -4,5 +4,6 @@ export const queryKeys = {
   },
   fetchProjects: {
     all: ["fetchAllProjects"] as const,
+    single: ["fetchProject"] as const,
   },
 };
