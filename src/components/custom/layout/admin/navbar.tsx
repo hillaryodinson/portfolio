@@ -20,6 +20,10 @@ function AdminNavbar() {
       url: "/admin/dashboard",
     },
     {
+      title: "Categories",
+      url: "/admin/category",
+    },
+    {
       title: "Projects",
       url: "/admin/projects",
     },
