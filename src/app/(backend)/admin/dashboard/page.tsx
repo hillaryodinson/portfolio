@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Card,
   CardHeader,
@@ -22,6 +22,7 @@ import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import AnalyticsCard from "./analytics";
+import { cn } from "@/lib/utils";
 function DashboardPage() {
   return (
     <>
@@ -35,12 +36,14 @@ function DashboardPage() {
                 Recent transactions from your store.
               </CardDescription>
             </div>
-            <Button asChild size="sm" className="ml-auto gap-1">
-              <Link href="#">
-                View All
-                <ArrowUpRight className="h-4 w-4" />
-              </Link>
-            </Button>
+
+            <Link
+              href="#"
+              className={cn(buttonVariants({ size: "sm" }), "ml-auto gap-1")}
+            >
+              View All
+              <ArrowUpRight className="h-4 w-4" />
+            </Link>
           </CardHeader>
           <CardContent>
             <Table>

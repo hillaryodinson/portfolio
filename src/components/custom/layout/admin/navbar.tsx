@@ -8,10 +8,11 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { Package2, Menu, Search, CircleUser } from "lucide-react";
+import { Package2, Menu, Search, CircleUser, ArrowUpRight } from "lucide-react";
 import { SheetTrigger, SheetContent, Sheet } from "@/components/ui/sheet";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 function AdminNavbar() {
   const menus = [
@@ -91,6 +92,14 @@ function AdminNavbar() {
             />
           </div>
         </form>
+        <Link
+          href="/"
+          className={cn(buttonVariants({ size: "sm" }), "ml-auto gap-1")}
+          target="_blank"
+        >
+          View Site
+          <ArrowUpRight className="h-4 w-4" />
+        </Link>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="secondary" size="icon" className="rounded-full">

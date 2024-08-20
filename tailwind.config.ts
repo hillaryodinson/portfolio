@@ -75,16 +75,43 @@ const config = {
           from: { opacity: "0" },
           to: { opacity: "1" },
         },
+        marquee: {
+          "100%": {
+            transform: "translateY(-50%)",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "fade-in": "fade-in 0.5s linear forwards",
         flashing: "flashing 1.4s infinite linear",
+        marquee: "marquee var(--marquee-duration) linear infinite",
       },
     },
   },
-  plugins: [require("tailwindcss-animate"), require("@tailwindcss/typography")],
+  plugins: [
+    // function ({ addBase, theme }) {
+    //   const colors = theme("colors");
+    //   const cssVariables = Object.keys(colors).reduce((acc, key) => {
+    //     const color = colors[key];
+    //     if (typeof color === "string") {
+    //       acc[`--color-${key}`] = color;
+    //     } else {
+    //       Object.keys(color).forEach((shade) => {
+    //         acc[`--color-${key}-${shade}`] = color[shade];
+    //       });
+    //     }
+    //     return acc;
+    //   }, {});
+
+    //   addBase({
+    //     ":root": cssVariables,
+    //   });
+    // },
+    require("tailwindcss-animate"),
+    require("@tailwindcss/typography"),
+  ],
 } satisfies Config;
 
 export default config;

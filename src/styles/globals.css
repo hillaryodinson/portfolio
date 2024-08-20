@@ -29,6 +29,9 @@
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
+
+    /* Custom Colors */
+    --color-green-600: rgb(22, 163, 74);
   }
 
   .dark {
@@ -72,5 +75,38 @@
     background-repeat: no-repeat;
     background-position: bottom right;
     background-size: contain;
+  }
+
+  .section-heading {
+    position: relative;
+  }
+  .section-heading::after {
+    @apply bg-green-600;
+    content: "";
+    position: absolute;
+    top: calc(100% + 1.5rem);
+    height: 5px;
+    width: 3rem;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 5px;
+  }
+
+  .skill-card {
+    @apply flex h-auto h-full w-full flex-col items-center justify-center space-y-4 rounded border-2 border-transparent bg-white p-4 text-center shadow transition-shadow duration-300 ease-in-out hover:shadow-lg dark:bg-zinc-800;
+  }
+
+  .portfolio-item {
+  }
+
+  .portfolio-grid:before {
+    border-radius: 5px;
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.2);
   }
 }
